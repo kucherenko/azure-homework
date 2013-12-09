@@ -29,23 +29,23 @@ c.on "connect", ->
 c.on "ready", ->
   console.log "Connection :: ready"
   c.sftp (err, sftp) ->
-  throw err  if err
-  sftp.on "end", ->
-    console.log "SFTP :: SFTP session closed"
-
-  sftp.opendir "/tmp", readdir = (err, handle) ->
     throw err  if err
-    sftp.readdir handle, (err, list) ->
-      throw err  if err
-      if list is false
-        sftp.close handle, (err) ->
-          throw err  if err
-          console.log "SFTP :: Handle closed"
-          sftp.end()
+    sftp.on "end", ->
+      console.log "SFTP :: SFTP session closed"
 
-        return
-      console.dir list
-      readdir `undefined`, handle
+    sftp.opendir "/tmp", readdir = (err, handle) ->
+      throw err  if err
+      sftp.readdir handle, (err, list) ->
+        throw err  if err
+        if list is false
+          sftp.close handle, (err) ->
+            throw err  if err
+            console.log "SFTP :: Handle closed"
+            sftp.end()
+
+          return
+        console.dir list
+        readdir `undefined`, handle
 
 c.on "error", (err) ->
   console.log "Connection :: error :: " + err

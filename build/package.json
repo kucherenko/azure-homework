@@ -1,0 +1,14 @@
+{
+    "name": "server",
+    "version": "0.0.0",
+    "description": "server",
+    "main": "index.coffee",
+    "scripts": {
+        "start": "coffee ./index.coffee"
+    },
+    "dependencies": {
+        "connect": "*"
+    },
+    "author": "",
+    "license": "BSD-2-Clause"
+}

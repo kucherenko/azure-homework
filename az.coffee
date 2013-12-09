@@ -1,19 +1,26 @@
 require 'shelljs/global'
 Connection = require("ssh2")
 
-VMNAME = "apk#{Math.random()}".replace ".", ""
+VMNAME = "apk#{Math.random()}".replace(".", "")[0..7]
+
 USER = "azureuser"
 PASSWORD = "a1234567P$"
+
 IMAGE = "b39f27a8b8c64d52b05eac6a62ebad85__Ubuntu-13_10-amd64-server-20131113-en-us-30GB"
-LOCATION  = "North Europe"
-create_vm = "azure vm create #{VMNAME} #{IMAGE} #{USER} #{PASSWORD} --location '#{LOCATION}'"
+
+LOCATION  = "West Europe"
+
+create_vm = "azure vm create --ssh --location '#{LOCATION}' #{VMNAME} #{IMAGE} #{USER} #{PASSWORD}"
 create_http_endpoint = "azure vm endpoint create #{VMNAME} 8081 8081"
-create_ssh_endpoint = "azure vm endpoint create #{VMNAME} 22 22"
+check_vm_status = "azure vm show #{VMNAME} --json"
 delete_vm = "azure vm delete #{VMNAME} -q"
 
 exec create_vm
-exec create_ssh_endpoint
 exec create_http_endpoint
+
+
+
+
 
 c = new Connection()
 c.on "connect", ->
@@ -40,7 +47,6 @@ c.on "ready", ->
       console.dir list
       readdir `undefined`, handle
 
-
 c.on "error", (err) ->
   console.log "Connection :: error :: " + err
 
@@ -49,6 +55,14 @@ c.on "end", ->
 
 c.on "close", (had_error) ->
   console.log "Connection :: close"
+
+isStarted = off
+
+while not isStarted
+  result = exec(check_vm_status, silent:true).output
+  result = JSON.parse result
+  console.log "Status: #{result.InstanceStatus}..."
+  isStarted = on if result.InstanceStatus is "ReadyRole"
 
 c.connect
   host: "#{VMNAME}.cloudapp.net"

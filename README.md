@@ -15,5 +15,6 @@ $> npm install coffee-script -g
 $> coffee az.coffee
 ```
 
+Open http://apk05354.cloudapp.net:8081/azure.jpg in browser.
 
 Enjoy!

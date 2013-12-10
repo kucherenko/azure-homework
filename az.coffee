@@ -19,33 +19,35 @@ exec create_vm
 exec create_http_endpoint
 
 
-
-
-
 c = new Connection()
 c.on "connect", ->
   console.log "Connection :: connect"
 
 c.on "ready", ->
   console.log "Connection :: ready"
-  c.sftp (err, sftp) ->
+  c.exec 'sudo apt-get install nodejs -y &&
+          sudo apt-get install npm -y &&
+          sudo apt-get install git -y &&
+          sudo mkdir /var/www &&
+          cd /var/www &&
+          sudo git clone https://github.com/kucherenko/azure-homework.git &&
+          cd /var/www/azure-homework/build &&
+          sudo sh /var/www/azure-homework/build/startup.sh &&
+          sudo npm start', (err, stream) ->
     throw err  if err
-    sftp.on "end", ->
-      console.log "SFTP :: SFTP session closed"
 
-    sftp.opendir "/tmp", readdir = (err, handle) ->
-      throw err  if err
-      sftp.readdir handle, (err, list) ->
-        throw err  if err
-        if list is false
-          sftp.close handle, (err) ->
-            throw err  if err
-            console.log "SFTP :: Handle closed"
-            sftp.end()
+    stream.on "data", (data, extended) ->
+      console.log ((if extended is "stderr" then "STDERR: " else "")) + data
 
-          return
-        console.dir list
-        readdir `undefined`, handle
+    stream.on "end", ->
+      console.log "Stream :: EOF"
+
+    stream.on "close", ->
+      console.log "Stream :: close"
+
+    stream.on "exit", (code, signal) ->
+      console.log "Stream :: exit :: code: " + code + ", signal: " + signal
+      c.end()
 
 c.on "error", (err) ->
   console.log "Connection :: error :: " + err
@@ -63,6 +65,8 @@ while not isStarted
   result = JSON.parse result
   console.log "Status: #{result.InstanceStatus}..."
   isStarted = on if result.InstanceStatus is "ReadyRole"
+
+console.log "################### #{VMNAME}.cloudapp.net ###################"
 
 c.connect
   host: "#{VMNAME}.cloudapp.net"

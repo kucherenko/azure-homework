@@ -13,11 +13,10 @@ $> npm install coffee-script -g
 
 4. Clone this repo to local folder
 
-5.
+5. Init project
 ```
 cd /path/to/this/repo && npm install
 ```
-
 6. Run
 ```
 $> coffee az.coffee

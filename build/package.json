@@ -4,9 +4,10 @@
     "description": "server",
     "main": "index.coffee",
     "scripts": {
-        "start": "coffee ./index.coffee"
+        "start": "nodejs ./run.js"
     },
     "dependencies": {
+        "coffee-script": "*",
         "connect": "*"
     },
     "author": "",
